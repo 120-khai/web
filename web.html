@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bầu Cua Online</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+        #game-container {
+            margin-top: 50px;
+        }
+        .fruit {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Bầu Cua Online</h1>
+
+    <div id="game-container">
+        <div id="players"></div>
+        <div class="fruit" onclick="selectFruit('bau')">Bầu</div>
+        <div class="fruit" onclick="selectFruit('cua')">Cua</div>
+        <div class="fruit" onclick="selectFruit('tom')">Tôm</div>
+        <div class="fruit" onclick="selectFruit('ca')">Cá</div>
+        <div class="fruit" onclick="selectFruit('ga')">Gà</div>
+        <div class="fruit" onclick="selectFruit('nai')">Nai</div>
+    </div>
+
+    <h2 id="result">Kết quả: </h2>
+    <div id="message"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const playerName = prompt('Nhập tên của bạn:');
+        socket.emit('joinGame', playerName);
+
+        socket.on('updatePlayers', (players) => {
+            const playersElement = document.getElementById('players');
+            playersElement.innerHTML = 'Người chơi: ' + players.join(', ');
+        });
+
+        socket.on('updateResult', ({ player, result }) => {
+            const resultElement = document.getElementById('result');
+            resultElement.innerHTML = `Kết quả: ${player} chọn ${result}`;
+        });
+
+        socket.on('showMessage', (message) => {
+            const messageElement = document.getElementById('message');
+            messageElement.innerHTML = message;
+        });
+
+        function selectFruit(fruit) {
+            socket.emit('selectFruit', fruit);
+        }
+    </script>
+
+</body>
+</html>
